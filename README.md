@@ -1,111 +1,202 @@
 # Sivika Studio - Selenium + Pytest Automation Framework
 
-UI test automation for **Sivika Studio**, a Flask-based handmade-art store, built with Python, Selenium WebDriver and Pytest using the Page Object Model.
+UI test automation for **Sivika Studio**, a Flask-based handmade-art store, built with Python, Selenium WebDriver and Pytest using the Page Object Model (POM).
 
 - **Website under test:** https://sivika.onrender.com/
-- **Status:** the framework and tests are written. **They have not been executed yet** - see [Results](#results).
+- **GitHub repository:** https://github.com/sidddddhi2104/Sivika-Studio-Automation-Copy
+- **Status:** The framework has been executed against the live website. Latest recorded full-suite run: 31 tests collected, 29 passed, 2 skipped, 0 failed.
 
 ## Tech stack
-Python 3.10+, Selenium 4 (Selenium Manager handles the browser driver), Pytest, pytest-html, python-dotenv, Git/GitHub.
 
-## What is automated (and why only this)
-Only functionality that was **verified on the live site** is automated: the public home, register and login pages and the navigation between them. Product, cart and checkout pages sit behind authentication and have not been inspected yet, so they are deliberately **not** automated (see Future improvements).
+- Python 3.14.2
+- Selenium 4
+- Selenium Manager
+- Pytest
+- pytest-html
+- python-dotenv
+- Git and GitHub
+
+## What is automated
+
+Only functionality verified on the live website is automated. Product, cart and checkout pages are not included because authenticated functionality has not been fully inspected.
 
 | Area | Automated checks |
 |---|---|
-| Home | exact page title, heading, handmade-products copy, "Start Shopping" link target |
-| Navigation | 5 link journeys (parameterized), direct URL access for 3 pages, browser Back |
-| Register | title, heading, hero image renders, submit button + login link, fillable fields exist, empty submit rejected, malformed e-mails rejected (parameterized) |
-| Login | title, heading, identity + password fields exist, submit + register link, empty submit rejected, 5 invalid-credential cases (parameterized) |
-| Authenticated (opt-in) | valid login leaves `/login`; valid user + wrong password rejected. Skipped unless a local test account is configured |
+| Home | Page title, heading, handmade-products copy and Start Shopping link |
+| Navigation | Parameterized link journeys, direct URL access and browser Back |
+| Register | Page title, heading, hero image, form fields, submit button, login link, empty submission and malformed email validation |
+| Login | Page title, heading, identity and password fields, submit button, register link, empty submission and invalid-credential cases |
+| Authenticated login | Optional tests for valid login and wrong-password rejection; skipped unless dedicated test credentials are configured |
 
-**Safety rules:** no real purchases or payments, and no test submits a *valid* registration, so the live database is not polluted.
+**Safety rules:** No real purchases or payments are performed. The tests do not submit a valid registration, avoiding unnecessary test data in the live database.
 
 ## Architecture
-- `pages/` - Page Objects: locators + actions only (`BasePage` holds waits and form helpers).
-- `tests/` - test flow and assertions only; no raw locators.
-- `utils/` - config, driver factory, locator helpers, read-only page inspector.
-- `test_data/` - parameterized data (no secrets).
-- `conftest.py` - `driver`, `base_url`, page fixtures, site warm-up (Render cold start), screenshot-on-failure hook.
-- `discover_site.py` - read-only inspector that lists the real links/forms/fields of each page.
 
-Design decisions: explicit waits only (no `sleep()`); locators are built from text confirmed on the live site; form fields are resolved from the DOM at runtime (`input[type=password]`, first other visible input) rather than guessing `name`/`id` attributes.
+- `pages/` - Page Objects containing locators and page actions.
+- `tests/` - Test flows and assertions.
+- `utils/` - Configuration, driver factory, locator helpers and page inspector.
+- `test_data/` - Parameterized test data; no secrets.
+- `conftest.py` - Browser and page fixtures, site warm-up and screenshot-on-failure handling.
+- `discover_site.py` - Read-only inspector for links, forms and fields.
+
+The framework uses explicit waits instead of `sleep()`. Form fields are resolved from the page DOM, and locators are based on the live site inspection.
 
 ## Folder structure
-```
+
+```text
 Sivika-Studio-Automation/
-├── pages/            base_page.py, home_page.py, register_page.py, login_page.py
-├── tests/            test_home.py, test_navigation.py, test_register.py, test_login.py, test_authenticated_login.py
-├── utils/            config.py, driver_factory.py, locator_helpers.py, page_inspector.py
-├── test_data/        form_data.py
-├── screenshots/      failure screenshots (git-ignored)
-├── reports/          HTML report (git-ignored)
-├── docs/             TEST_PLAN.md, INTERVIEW_PREP.md, RESUME_AND_METRICS_TEMPLATE.md
+├── pages/
+│   ├── base_page.py
+│   ├── home_page.py
+│   ├── register_page.py
+│   └── login_page.py
+├── tests/
+│   ├── test_home.py
+│   ├── test_navigation.py
+│   ├── test_register.py
+│   ├── test_login.py
+│   └── test_authenticated_login.py
+├── utils/
+│   ├── config.py
+│   ├── driver_factory.py
+│   ├── locator_helpers.py
+│   └── page_inspector.py
+├── test_data/
+│   └── form_data.py
+├── screenshots/
+├── reports/
+├── docs/
+│   ├── TEST_PLAN.md
+│   ├── INTERVIEW_PREP.md
+│   └── RESUME_AND_METRICS_TEMPLATE.md
 ├── discover_site.py
-├── conftest.py  pytest.ini  requirements.txt  .env.example  .gitignore
+├── conftest.py
+├── pytest.ini
+├── requirements.txt
+├── .env.example
+└── .gitignore
 ```
 
-## Installation (Windows + VS Code, PowerShell)
-Prerequisites: Python 3.10+ (tick "Add to PATH"), Google Chrome, VS Code with the Python extension.
+## Installation (Windows, VS Code and PowerShell)
+
+Prerequisites: Python, Google Chrome, Git and VS Code with the Python extension.
 
 ```powershell
-cd path\to\Sivika-Studio-Automation
-code .
 py -m venv venv
-# if activation is blocked:  Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 copy .env.example .env
 ```
-In VS Code: `Ctrl+Shift+P` -> **Python: Select Interpreter** -> pick `.\venv\Scripts\python.exe`.
 
-## Step 1 - inspect the real forms first (recommended)
+If PowerShell blocks virtual-environment activation, run:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+In VS Code, open **Ctrl + Shift + P**, choose **Python: Select Interpreter**, and select `.\venv\Scripts\python.exe`.
+
+## Inspect the live website
+
+Run:
+
 ```powershell
 python discover_site.py
 ```
-This prints and saves (`reports\discovery_report.json`) every real link, form and field. Check that the register/login fields look as expected before trusting the form tests.
+
+The inspector prints information about the website's links, forms and fields. Review the output before adding automation for pages that have not yet been verified.
 
 ## Running tests
-```powershell
-pytest                                   # everything; HTML report -> reports\report.html
-pytest --html=reports/report.html        # explicit report path
-pytest -m smoke                          # critical checks only
-pytest -m "not auth"                     # skip authenticated tests
-pytest -m navigation
-pytest tests/test_login.py -k invalid
-pytest --headless                        # no browser window
-pytest --browser edge                    # chrome (default) | edge | firefox
-```
-The first request may be slow: the site is on Render and can be asleep. The suite warms it up once automatically.
 
-### Authenticated tests (optional)
-Edit your local `.env` (never committed) and use a **dedicated test account**:
+Run the full test suite:
+
+```powershell
+pytest
 ```
-SIVIKA_TEST_USERNAME=...
-SIVIKA_TEST_PASSWORD=...
+
+Generate an HTML report:
+
+```powershell
+pytest --html=reports/report.html
 ```
-Then `pytest -m auth`. Without these values the tests are skipped.
+
+Run smoke tests:
+
+```powershell
+pytest -m smoke
+```
+
+Skip authenticated tests:
+
+```powershell
+pytest -m "not auth"
+```
+
+Run navigation tests:
+
+```powershell
+pytest -m navigation
+```
+
+Run invalid-login tests:
+
+```powershell
+pytest tests/test_login.py -k invalid
+```
+
+Run without opening a browser window:
+
+```powershell
+pytest --headless
+```
+
+The website is hosted on Render, so the first request may take longer if the site is asleep. The test suite warms up the website automatically.
+
+## Authenticated tests (optional)
+
+The authenticated tests require a dedicated QA account. Configure these values in your local `.env` file:
+
+```text
+SIVIKA_TEST_USERNAME=your_test_username
+SIVIKA_TEST_PASSWORD=your_test_password
+```
+
+Never commit `.env` or publish credentials to GitHub. These tests are skipped when the required credentials are not configured.
 
 ## Reports and failure handling
-`reports\report.html` is a self-contained report showing passed / failed / skipped and per-test duration. On any failed UI test a screenshot is saved to `screenshots\` and embedded in the report together with the failing URL.
+
+The HTML report is generated at `reports/report.html`. It includes test outcomes and per-test durations.
+
+When a UI test fails, the framework saves a screenshot in `screenshots/` and embeds it in the report alongside failure information.
+
+Generated report files and screenshots are excluded from Git through `.gitignore`.
 
 ## Results
-**Not executed yet.** Fill this table only from your own real run:
+
+Latest recorded full-suite execution:
 
 | Metric | Value |
 |---|---|
-| Date / browser / headless | |
-| Total tests | |
-| Passed | |
-| Failed | |
-| Skipped | |
-| Total duration | |
+| Python | 3.14.2 |
+| Platform | Windows 11 |
+| Pytest | 9.1.1 |
+| Tests collected | 31 |
+| Passed | 29 |
+| Failed | 0 |
+| Skipped | 2 |
+| Errors | 0 |
+| Duration | Approximately 2 minutes 53 seconds |
 
-Collected by pytest (not executed): 36 tests. Real outcomes - including any genuine failures - go in the table above after you run `pytest`.
+The two skipped tests are the optional authenticated-login tests. They require `SIVIKA_TEST_USERNAME` and `SIVIKA_TEST_PASSWORD` to be configured for a dedicated QA account.
+
+These results reflect the latest recorded run and should be updated after future test executions.
 
 ## Future improvements
-- Automate product browsing, search, cart and checkout (up to, but excluding, payment) once the authenticated pages are inspected with `discover_site.py --login`.
-- Assert on error/flash messages once their real elements are known.
+
+- Inspect and automate product browsing, search, cart and checkout, stopping before payment.
+- Add assertions for login and registration error messages after verifying the actual page elements.
 - Add an opt-in registration test using a disposable account and cleanup.
-- Run in GitHub Actions on a schedule; add cross-browser matrix and `pytest-xdist`.
+- Configure GitHub Actions to run tests automatically.
+- Add cross-browser testing and parallel test execution.
+- Expand test coverage as additional website functionality is verified.
