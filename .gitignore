@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+venv/
+.venv/
+
+# Secrets - never commit
+.env
+
+# Generated artefacts (folders are kept via .gitkeep)
+reports/*
+!reports/.gitkeep
+screenshots/*
+!screenshots/.gitkeep
+
+# IDE / OS
+.idea/
+Thumbs.db
+.DS_Store
